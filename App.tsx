@@ -41,7 +41,8 @@ import {
   Loader2,
   ArrowUpRight,
   ArrowDownRight,
-  Activity
+  Activity,
+  Plus
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ALL_BANKS, ALL_PRODUCTS, CURRENCIES } from './constants';
@@ -788,9 +789,142 @@ const BankExplorer = () => {
   );
 };
 
+// 5. Comparison Modal Component
+const ComparisonModal = ({ 
+  isOpen, 
+  onClose, 
+  products, 
+  typeFilter 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  products: Product[]; 
+  typeFilter: 'Loan' | 'Card' 
+}) => {
+  if (!isOpen || products.length === 0) return null;
+
+  // Get comparison terms based on product type
+  const getComparisonTerms = () => {
+    if (typeFilter === 'Card') {
+      return [
+        { label: 'Annual Fee', key: 'annualFee' },
+        { label: 'Reward Rate', key: 'rewardRate' },
+        { label: 'Cashback', key: 'cashback', default: 'Up to 5%' },
+        { label: 'Lounge Access', key: 'lounge', default: 'Unlimited' },
+        { label: 'Insurance Coverage', key: 'insurance', default: '1 Cr+' },
+        { label: 'Welcome Bonus', key: 'bonus', default: '5,000 Points' },
+        { label: 'Dining Benefits', key: 'dining', default: 'Yes' },
+        { label: 'Travel Benefits', key: 'travel', default: 'Yes' },
+        { label: 'GST Reimbursement', key: 'gst', default: 'Yes' },
+        { label: 'Fuel Surcharge', key: 'fuel', default: '1%' },
+        { label: 'Movie Bookings', key: 'movies', default: 'Yes' },
+        { label: 'Companion Passes', key: 'companion', default: 'Yes' },
+        { label: 'Golf Benefits', key: 'golf', default: 'Yes' },
+        { label: 'Shopping Rewards', key: 'shopping', default: '3% back' },
+        { label: 'Emergency Support', key: 'emergency', default: '24/7' },
+        { label: 'Billing Support', key: 'billing', default: '24/7' },
+      ];
+    }
+    
+    return [
+      { label: 'Interest Rate (p.a.)', key: 'interestRate' },
+      { label: 'Processing Fee', key: 'processingFee', default: '0.5-1%' },
+      { label: 'Maximum Tenure', key: 'maxTenure' },
+      { label: 'Maximum Amount', key: 'maxAmount', default: '50 Lakhs' },
+      { label: 'Minimum Amount', key: 'minAmount', default: '1 Lakh' },
+      { label: 'Hidden Charges', key: 'hidden', default: 'None' },
+      { label: 'Prepayment Charges', key: 'prepay', default: 'Nil' },
+      { label: 'Loan Type', key: 'loanType', default: products[0]?.type },
+      { label: 'Eligibility (Age)', key: 'age', default: '21-65 Years' },
+      { label: 'Income Criteria', key: 'income', default: 'Flexible' },
+      { label: 'Required Documents', key: 'docs', default: '3 Docs' },
+      { label: 'Approval Time', key: 'approval', default: '24-48 Hours' },
+      { label: 'Insurance Coverage', key: 'insurance', default: 'Yes' },
+      { label: 'Online Application', key: 'online', default: 'Yes' },
+      { label: 'EMI Calculator', key: 'calculator', default: 'Available' },
+      { label: 'Step-up Facility', key: 'stepup', default: 'Yes' },
+    ];
+  };
+
+  const terms = getComparisonTerms();
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-h-[90vh] overflow-hidden w-full max-w-6xl flex flex-col">
+        {/* Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-slate-700 dark:to-slate-800 p-6 flex items-center justify-between border-b border-white/10">
+          <div>
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <TrendingUp size={28} /> Product Comparison
+            </h2>
+            <p className="text-blue-100 dark:text-gray-300 text-sm mt-1">Compare {products.length} {typeFilter === 'Card' ? 'cards' : 'loan products'} with 15+ detailed terms</p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 hover:bg-white/10 rounded-full transition-colors text-white"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Comparison Table */}
+        <div className="flex-1 overflow-x-auto overflow-y-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="sticky top-0 bg-blue-50 dark:bg-slate-700 border-b-2 border-blue-200 dark:border-white/10">
+                <th className="sticky left-0 bg-blue-50 dark:bg-slate-700 p-4 min-w-[220px] z-20 border-r border-blue-200 dark:border-white/10"></th>
+                {products.map((product, idx) => (
+                  <th key={idx} className="p-4 min-w-[250px] text-center">
+                    <div className="space-y-2">
+                      <div className="font-bold text-blue-700 dark:text-neon-blue text-lg">
+                        {product.name}
+                      </div>
+                      <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        {product.bankName}
+                      </div>
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {terms.map((term, idx) => (
+                <tr key={idx} className="border-b border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                  <td className="sticky left-0 bg-gray-100 dark:bg-slate-700/50 p-4 font-semibold text-gray-900 dark:text-white min-w-[220px] z-10 border-r border-gray-200 dark:border-white/10">
+                    {term.label}
+                  </td>
+                  {products.map((product, pIdx) => (
+                    <td key={pIdx} className="p-4 min-w-[250px] text-center">
+                      <div className="font-bold text-blue-600 dark:text-neon-blue text-lg">
+                        {(product as any)[term.key] || term.default || '—'}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Action Footer */}
+        <div className="sticky bottom-0 bg-gray-50 dark:bg-slate-700/30 p-6 border-t border-gray-200 dark:border-white/10 flex gap-3 justify-end">
+          <button 
+            onClick={onClose}
+            className="px-6 py-2.5 rounded-lg bg-gray-200 dark:bg-white/10 text-gray-800 dark:text-white font-medium hover:bg-gray-300 dark:hover:bg-white/20 transition-all"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // 5. Product Center
 const ProductCenter = ({ typeFilter }: { typeFilter: 'Loan' | 'Card' }) => {
   const [selectedType, setSelectedType] = useState<string>('All');
+  const [compareProducts, setCompareProducts] = useState<Product[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
   
   const relevantTypes = typeFilter === 'Loan' 
     ? [ProductType.HomeLoan, ProductType.CarLoan, ProductType.BusinessLoan, ProductType.StartupLoan]
@@ -804,8 +938,58 @@ const ProductCenter = ({ typeFilter }: { typeFilter: 'Loan' | 'Card' }) => {
     });
   }, [selectedType, relevantTypes]);
 
+  const toggleProductCompare = (product: Product) => {
+    setCompareProducts(prev => {
+      const exists = prev.find(p => p.id === product.id);
+      if (exists) {
+        return prev.filter(p => p.id !== product.id);
+      } else if (prev.length < 4) {
+        return [...prev, product];
+      }
+      return prev;
+    });
+  };
+
   return (
     <div className="pt-28 pb-10 px-4 max-w-7xl mx-auto">
+      {/* Comparison Modal */}
+      <ComparisonModal 
+        isOpen={showComparison}
+        onClose={() => setShowComparison(false)}
+        products={compareProducts}
+        typeFilter={typeFilter}
+      />
+
+      {/* Comparison Bar */}
+      {compareProducts.length > 0 && (
+        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-500/30 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {compareProducts.map((p, i) => (
+                <div key={p.id} className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-500/30 text-blue-700 dark:text-blue-300 text-sm font-medium">
+                  <span>{p.bankName}</span>
+                  <button 
+                    onClick={() => toggleProductCompare(p)}
+                    className="ml-1 hover:text-blue-900 dark:hover:text-white"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <span className="text-sm text-blue-700 dark:text-blue-300">
+              Selected: {compareProducts.length}/4 products
+            </span>
+          </div>
+          <button 
+            onClick={() => setShowComparison(true)}
+            className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2"
+          >
+            <TrendingUp size={16} /> Compare Now
+          </button>
+        </div>
+      )}
+
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{typeFilter === 'Loan' ? 'Global Lending Center' : 'Cards & Forex Hub'}</h2>
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
@@ -828,45 +1012,53 @@ const ProductCenter = ({ typeFilter }: { typeFilter: 'Loan' | 'Card' }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {filteredProducts.slice(0, 40).map((product: Product) => (
-          <div key={product.id} className="bg-white dark:bg-slate-800/50 border border-gray-200 dark:border-white/10 p-5 rounded-xl flex flex-col sm:flex-row gap-6 items-center sm:items-start group hover:border-blue-400 dark:hover:border-neon-blue/30 shadow-sm hover:shadow-md transition-all">
-            <div className="flex-1 w-full">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <span className="text-xs font-bold text-blue-600 dark:text-neon-blue uppercase tracking-wider">{product.bankName}</span>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-neon-blue transition-colors">{product.name}</h3>
-                </div>
-                <div className="bg-gray-100 dark:bg-white/5 px-3 py-1 rounded text-right">
-                  <div className="text-xs text-gray-500 dark:text-gray-400">{product.type === ProductType.CreditCard ? 'Annual Fee' : 'Interest Rate'}</div>
-                  <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
-                    {product.type === ProductType.CreditCard ? product.annualFee : product.interestRate}
+        {filteredProducts.slice(0, 40).map((product: Product) => {
+          const isSelected = compareProducts.find(p => p.id === product.id);
+          return (
+            <div key={product.id} className={`bg-white dark:bg-slate-800/50 border-2 p-5 rounded-xl flex flex-col sm:flex-row gap-6 items-center sm:items-start group hover:border-blue-400 dark:hover:border-neon-blue/30 shadow-sm hover:shadow-md transition-all ${isSelected ? 'border-blue-500 dark:border-neon-blue/60 bg-blue-50 dark:bg-blue-900/10' : 'border-gray-200 dark:border-white/10'}`}>
+              <div className="flex-1 w-full">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <span className="text-xs font-bold text-blue-600 dark:text-neon-blue uppercase tracking-wider">{product.bankName}</span>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-neon-blue transition-colors">{product.name}</h3>
+                  </div>
+                  <div className="bg-gray-100 dark:bg-white/5 px-3 py-1 rounded text-right">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{product.type === ProductType.CreditCard ? 'Annual Fee' : 'Interest Rate'}</div>
+                    <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                      {product.type === ProductType.CreditCard ? product.annualFee : product.interestRate}
+                    </div>
                   </div>
                 </div>
+                
+                <ul className="space-y-1 mb-4">
+                  {product.features.slice(0, 3).map((f: string, i: number) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                      <CheckCircle2 size={14} className="text-gray-400 dark:text-gray-500" /> {f}
+                    </li>
+                  ))}
+                </ul>
               </div>
               
-              <ul className="space-y-1 mb-4">
-                {product.features.slice(0, 3).map((f: string, i: number) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                    <CheckCircle2 size={14} className="text-gray-400 dark:text-gray-500" /> {f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            <div className="flex flex-col gap-2 w-full sm:w-auto min-w-[140px]">
-              <div className="text-center p-3 rounded-lg bg-gray-50 dark:bg-black/20 mb-1 border border-gray-100 dark:border-transparent">
-                 <div className="text-xs text-gray-500 mb-1">{product.type === ProductType.CreditCard ? 'Reward Rate' : 'Max Tenure'}</div>
-                 <div className="font-mono text-gray-900 dark:text-white font-bold">{product.type === ProductType.CreditCard ? product.rewardRate : product.maxTenure}</div>
+              <div className="flex flex-col gap-2 w-full sm:w-auto min-w-[140px]">
+                <div className="text-center p-3 rounded-lg bg-gray-50 dark:bg-black/20 mb-1 border border-gray-100 dark:border-transparent">
+                   <div className="text-xs text-gray-500 mb-1">{product.type === ProductType.CreditCard ? 'Reward Rate' : 'Max Tenure'}</div>
+                   <div className="font-mono text-gray-900 dark:text-white font-bold">{product.type === ProductType.CreditCard ? product.rewardRate : product.maxTenure}</div>
+                </div>
+                <a href={product.applyUrl} target="_blank" rel="noreferrer" className="w-full py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-center font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                  Apply Now <ExternalLink size={12} />
+                </a>
+                <button 
+                  onClick={() => toggleProductCompare(product)}
+                  disabled={compareProducts.length >= 4 && !isSelected}
+                  className={`w-full py-2.5 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 ${isSelected ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20' : 'border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed'}`}
+                >
+                  {isSelected ? <CheckCircle2 size={14} /> : <Plus size={14} />}
+                  {isSelected ? 'Remove from Compare' : 'Add to Compare'}
+                </button>
               </div>
-              <a href={product.applyUrl} target="_blank" rel="noreferrer" className="w-full py-2.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-center font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
-                Apply Now <ExternalLink size={12} />
-              </a>
-              <button className="w-full py-2.5 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 text-sm font-medium transition-all">
-                Compare
-              </button>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
