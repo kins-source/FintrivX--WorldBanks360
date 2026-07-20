@@ -1,7 +1,7 @@
 <div align="center">
 
 
-# fintrivx-Main-project
+# fintrivx-WorldBanks360: Loan Comparison & Advisory Platform
 
 This contains everything you need to run your app locally.
 
